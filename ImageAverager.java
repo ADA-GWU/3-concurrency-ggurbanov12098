@@ -1,17 +1,20 @@
 import java.io.File;
 import java.io.IOException;
-
 import javax.imageio.ImageIO;
+import javax.swing.JFrame;
+// import javax.swing.JScrollPane;
+import java.awt.BorderLayout;
 import java.awt.image.BufferedImage;
 
-public class ImageAverager {
-    @SuppressWarnings("unused")
+
+public class ImageAverager extends JFrame{
     private BufferedImage originalImage;
     @SuppressWarnings("unused")
     private final int squareSize;
     @SuppressWarnings("unused")
     private final String mode;
 
+    private final ImagePanel imagePanel; // The custom JPanel that displays the image
 
     public ImageAverager(String filename, int squareSize, String mode) {
         this.squareSize = squareSize;
@@ -23,25 +26,16 @@ public class ImageAverager {
             System.err.println("Error: Unable to load image file.");
             System.exit(1);
         }
-    }
-
-
-
-
-    //////////////// Experimental Area ¯\_(ツ)_/¯ ////////////////
-
-    public boolean isLoaded() {
-        return originalImage != null;
-    }
-
-    public static void main(String[] args) {
-        // Example usage
-        ImageAverager imageAverager = new ImageAverager("test.jpg", 1, "test");
-
-        if (imageAverager.isLoaded()) {
-            System.out.println("Image loaded successfully.");
-        } else {
-            System.out.println("Failed to load the image.");
-        }
+        
+        /** Set up the GUI */
+        setTitle("Image Averager"); // Title of custom (JFrame) window
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); //Specifies what happens when the user closes the window
+        imagePanel = new ImagePanel(originalImage); // new class for GUI, to handle and display the image
+        /**We won't need scrollPane, because scaling down relative to ratio will help */
+        // JScrollPane scrollPane = new JScrollPane(imagePanel);
+        getContentPane().add(imagePanel, BorderLayout.CENTER); //adds image to content pane and places center
+        pack(); // auto-sizes the window to fit the preferred size and layout
+        setLocationRelativeTo(null); // Centers(null) the JFrame itself on the screen
+        setVisible(true); // Visible
     }
 }
