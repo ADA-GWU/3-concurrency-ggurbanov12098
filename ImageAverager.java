@@ -41,6 +41,8 @@ public class ImageAverager extends JFrame{
         // Start processing in appropriate thread to keep GUI responsive
         new Thread(() -> {
             // ImageProcessor() => SingleThread and MultiThread mode...
-        }
+            ImageProcessor processor = new ImageProcessor(originalImage, squareSize);
+            processor.processImageSingleThreaded(() -> imagePanel.repaint());
+        }).start();
     }
 }

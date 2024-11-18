@@ -1,3 +1,5 @@
+import javax.swing.SwingUtilities;
+
 public class Main {
     public static void main(String[] args) {
         // Validate command-line arguments
@@ -19,5 +21,10 @@ public class Main {
             System.exit(1);
             return; // Unreachable, but added to satisfy the compiler
         }
+        
+        final String filename = args[0];
+        final int squareSize = tempSquareSize; // Now squareSize is final
+        final String mode = args[2].toUpperCase();
+        SwingUtilities.invokeLater(() -> new ImageAverager(filename, squareSize, mode));
     }
 }

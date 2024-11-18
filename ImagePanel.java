@@ -12,9 +12,7 @@ import javax.swing.JPanel;
 public class ImagePanel extends JPanel{
     private final int displayedWidth;   // The width of the displayed (possibly scaled) image
     private final int displayedHeight;  // The height of the displayed (possibly scaled) image
-    
     private final BufferedImage displayedImage; // The BufferedImage used for displaying the image
-    @SuppressWarnings("unused")
     private final BufferedImage originalImage;  // Reference to the original image
     
     public ImagePanel(BufferedImage originalImage) {
@@ -65,7 +63,11 @@ public class ImagePanel extends JPanel{
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
         if (displayedImage != null) {
-            g.drawImage(displayedImage, 0, 0, this);
+            // Update the displayed image with the current state of originalImage
+            Graphics2D g2d = displayedImage.createGraphics();
+            g2d.drawImage(originalImage, 0, 0, displayedWidth, displayedHeight, null);
+            g2d.dispose();
+            g.drawImage(displayedImage, 0, 0, null);
         }
     }
 

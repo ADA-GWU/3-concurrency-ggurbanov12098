@@ -1,5 +1,6 @@
 import java.awt.Color;
 import java.awt.image.BufferedImage;
+import javax.swing.SwingUtilities;
 
 public class ImageProcessor {
     private final BufferedImage image;
@@ -13,6 +14,7 @@ public class ImageProcessor {
         this.image = image;
         this.squareSize = squareSize;
     }
+
 
     /**
      * Processes single block of the image, calculating the average color by
@@ -52,5 +54,29 @@ public class ImageProcessor {
     }
 
 
-
+    /**
+     * Processes the image in a single-thread, averaging each block sequentially
+     * @param repaintCallback callback to repaint the image in the GUI
+     */
+    public void processImageSingleThreaded(Runnable repaintCallback) {
+        int width = image.getWidth();
+        int height = image.getHeight();
+        // Iterate the image while squareSize increments
+        for (int y = 0; y < height; y += squareSize) {
+            for (int x = 0; x < width; x += squareSize) {
+                processBlock(x, y);
+                // Schedule a repaint on the Event Dispatch Thread (EDT)
+                // Source: https://github.com/mgarin/weblaf/wiki/Event-Dispatch-Thread
+                SwingUtilities.invokeLater(repaintCallback);
+                try {
+                    Thread.sleep(10); // Delay to visualize
+                } catch (InterruptedException e) {
+                    System.err.println("Error: Thread interrupted.");
+                    Thread.currentThread().interrupt(); // Restore interrupt status
+                }
+            }
+        }
+        // Final repaint to ensure all changes are displayed
+        SwingUtilities.invokeLater(repaintCallback);
+    }
 }
