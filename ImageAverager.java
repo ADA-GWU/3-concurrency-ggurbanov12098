@@ -37,5 +37,10 @@ public class ImageAverager extends JFrame{
         pack(); // auto-sizes the window to fit the preferred size and layout
         setLocationRelativeTo(null); // Centers(null) the JFrame itself on the screen
         setVisible(true); // Visible
+
+        // Start processing in appropriate thread to keep GUI responsive
+        new Thread(() -> {
+            // ImageProcessor() => SingleThread and MultiThread mode...
+        }
     }
 }
