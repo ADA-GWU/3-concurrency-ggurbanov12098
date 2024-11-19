@@ -11,7 +11,7 @@ public class ImageAverager extends JFrame{
     private BufferedImage originalImage;
     @SuppressWarnings("unused")
     private final int squareSize;
-    @SuppressWarnings("unused")
+    // @SuppressWarnings("unused")
     private final String mode;
 
     private final ImagePanel imagePanel; // The custom JPanel that displays the image
@@ -40,9 +40,23 @@ public class ImageAverager extends JFrame{
 
         // Start processing in appropriate thread to keep GUI responsive
         new Thread(() -> {
-            // ImageProcessor() => SingleThread and MultiThread mode...
             ImageProcessor processor = new ImageProcessor(originalImage, squareSize);
-            processor.processImageSingleThreaded(() -> imagePanel.repaint());
+            if (mode.equals("S")) {
+                processor.processImageSingleThreaded(() -> imagePanel.repaint());
+            } else if (mode.equals("M")) {
+                processor.processImageMultiThreaded(() -> imagePanel.repaint());
+            } else {
+                System.err.println("Error: Invalid processing mode. Use 'S' for single-threaded or 'M' for multi-threaded.");
+                System.exit(1);
+            }
+
+            // Saving processed image
+            try {
+                ImageIO.write(originalImage, "jpg", new File("result.jpg"));
+                System.out.println("Processing complete. Result saved as 'result.jpg'.");
+            } catch (IOException e) {
+                System.err.println("Error: Failed to save result image.");
+            }
         }).start();
     }
 }

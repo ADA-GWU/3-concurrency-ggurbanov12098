@@ -22,7 +22,7 @@ public class ImageProcessor {
      * @param xStart The starting x-coordinate of the block
      * @param yStart The starting y-coordinate of the block
      */
-    public void processBlock(int xStart, int yStart) {
+    private void processBlock(int xStart, int yStart) {
         int width = image.getWidth();
         int height = image.getHeight();
         int xEnd = Math.min(xStart + squareSize, width);
@@ -72,11 +72,58 @@ public class ImageProcessor {
                     Thread.sleep(10); // Delay to visualize
                 } catch (InterruptedException e) {
                     System.err.println("Error: Thread interrupted.");
-                    Thread.currentThread().interrupt(); // Restore interrupt status
+                    Thread.currentThread().interrupt(); // Restore interrupt
                 }
             }
         }
         // Final repaint to ensure all changes are displayed
+        SwingUtilities.invokeLater(repaintCallback);
+    }
+
+
+    /**
+     * Processes the image in multiple-threads, dividing the image into segments
+     * based on the number of available CPU cores
+     * @param repaintCallback callback to repaint the image in the GUI
+     */
+    public void processImageMultiThreaded(Runnable repaintCallback) {
+        int numThreads = Runtime.getRuntime().availableProcessors();
+        Thread[] threads = new Thread[numThreads];
+        int height = image.getHeight();
+        int segmentHeight = height / numThreads;
+        // Create and start threads
+        for (int i = 0; i < numThreads; i++) {
+            final int threadIndex = i;
+            threads[i] = new Thread(() -> {
+                int startY = threadIndex * segmentHeight;
+                int endY = (threadIndex == numThreads - 1) ? height : startY + segmentHeight;
+                // Iterate over the assigned segment
+                for (int y = startY; y < endY; y += squareSize) {
+                    for (int x = 0; x < image.getWidth(); x += squareSize) {
+                        processBlock(x, y);
+                        // Scheduling repaint
+                        SwingUtilities.invokeLater(repaintCallback);
+                        try {
+                            Thread.sleep(10); // Delay to visualize
+                        } catch (InterruptedException e) {
+                            System.err.println("Error: Thread interrupted.");
+                            Thread.currentThread().interrupt(); // Restore interrupt
+                        }
+                    }
+                }
+            });
+            threads[i].start();
+        }
+        // Waiting for all threads to complete
+        for (Thread t : threads) {
+            try {
+                t.join();
+            } catch (InterruptedException e) {
+                System.err.println("Error: Thread interrupted.");
+                Thread.currentThread().interrupt(); // Restore interrupt
+            }
+        }
+        // Final repaint after all threads have finished
         SwingUtilities.invokeLater(repaintCallback);
     }
 }

@@ -9,6 +9,14 @@ public class Main {
             System.exit(1);
         }
 
+        // Mode validation
+        final String mode = args[2].toUpperCase();
+        if (!mode.equals("S") && !mode.equals("M")) {
+            System.err.println("Error: Invalid processing mode. Use 'S' for single-threaded or 'M' for multi-threaded.");
+            System.exit(1);
+        }
+
+
         int tempSquareSize;
         // Parse and validate the square size argument
         try {
@@ -24,7 +32,7 @@ public class Main {
         
         final String filename = args[0];
         final int squareSize = tempSquareSize; // Now squareSize is final
-        final String mode = args[2].toUpperCase();
+        // final String mode = args[2].toUpperCase();
         SwingUtilities.invokeLater(() -> new ImageAverager(filename, squareSize, mode));
     }
 }
